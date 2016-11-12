@@ -34,23 +34,27 @@ public class EntityInfo {
     }
 
     public void tickInCombat(){
-        if(lastShot == null && lastHit == null)
+        if(!isInCombat())
             return;
 
         double shotDifference, hitDifference;
+        boolean give = true;
 
+        //If they have shot an attack within this "session" of combat, was it over 5 seconds ago?
         if(lastShot != null) {
             shotDifference = System.currentTimeMillis() - lastShot;
-            if(shotDifference <= CombatLogAPI.getCombatInterval()){
-                setInCombat(true);
-            } else setInCombat(false);
+            if(shotDifference > CombatLogAPI.getCombatInterval()){
+                give = false;
+            }
         }
+        //If they have been hit within this "session" of combat, was it over 5 seconds ago?
         if(lastHit != null) {
             hitDifference = System.currentTimeMillis() - lastHit;
-            if(hitDifference <= CombatLogAPI.getCombatInterval()){
-                setInCombat(true);
-            } else setInCombat(false);
+            if(hitDifference > CombatLogAPI.getCombatInterval()){
+                give = false;
+            } else give = true;
         }
+        setInCombat(give);
     }
 
     public void setLastShot() {
@@ -64,8 +68,10 @@ public class EntityInfo {
 
     private void setInCombat(boolean inCombat) {
         this.inCombat = inCombat;
-        if(this.inCombat == false)
+        if(this.inCombat == false) {
             entries.clear();
+            lastHit = lastShot = null;
+        }
     }
 
     public List<EntryContainer> getEntries() {
