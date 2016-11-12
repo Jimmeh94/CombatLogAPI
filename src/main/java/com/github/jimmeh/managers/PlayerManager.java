@@ -32,7 +32,7 @@ public class PlayerManager {
         return null;
     }
 
-    private boolean doesEntityExist(UUID uuid){
+    public boolean doesEntityExist(UUID uuid){
         for(EntityInfo entityInfo: entityInfos){
             if(entityInfo.getUuid().equals(uuid))
                 return true;

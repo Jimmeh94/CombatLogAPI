@@ -1,7 +1,9 @@
 package com.github.jimmeh.entity;
 
-import com.github.jimmeh.entries.CombatEntityEntry;
 import com.github.jimmeh.CombatLogAPI;
+import com.github.jimmeh.entries.CombatEntry;
+import com.github.jimmeh.entries.EntryContainer;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,21 +11,22 @@ import java.util.UUID;
 
 public class EntityInfo {
 
-    private List<CombatEntityEntry> entries = new ArrayList<>();
+    private List<EntryContainer> entries = new ArrayList<>();
     private Long lastShot, lastHit;
     private boolean inCombat = false, canReceiveDamage = true;
     private UUID uuid;
 
     public void displayEntries(){};
 
-    public EntityInfo(UUID uuid){this.uuid = uuid;}
+    public EntityInfo(UUID uuid){
+        this.uuid = uuid;
+    }
 
     //Entries are only for when the entity gets hit
-    public void addEntry(CombatEntityEntry entry){
-        entries.add(0, entry);
-        if(entries.size() > 5){
-            for(int i = 5; i < entries.size(); i++){
-                entries.remove(i);
+    public void addEntry(CombatEntry entry){
+        for(EntryContainer container: entries){
+            if(container.getOwner().equals(entry.getOwner())){
+                container.addEntry(entry);
             }
         }
         lastHit = System.currentTimeMillis();
@@ -65,7 +68,7 @@ public class EntityInfo {
             entries.clear();
     }
 
-    public List<CombatEntityEntry> getEntries() {
+    public List<EntryContainer> getEntries() {
         return entries;
     }
 
@@ -89,4 +92,15 @@ public class EntityInfo {
         return uuid;
     }
 
+    public boolean hasEntryContainer(UUID owner) {
+        for(EntryContainer container: entries){
+            if(container.getOwner().equals(owner))
+                return true;
+        }
+        return false;
+    }
+
+    public void addEntryContainer(UUID owner) {
+        entries.add(new EntryContainer(owner));
+    }
 }
